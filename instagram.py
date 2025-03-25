@@ -26,25 +26,21 @@ def click_helper(element):
     element.click()
     time.sleep(2)
 
-def wait_element_loading(driver, By, path):
+def find_by_element(driver, By, path):
     if By == "XPATH":
-        while True:
             try:
                 el = driver.find_element(by=AppiumBy.XPATH, value=path)
                 return el
             except:
                 print(f"No Element Found, {path}")
-                time.sleep(2)
-    
+                return False
     if By == "UIA":
-        while True:
             try:
                 time.sleep(2)
                 el = driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value=path)
                 return el
             except:
-                print(f"No Element Found, {path}")
-                time.sleep(2)
+                return False
 
 def nhan_job_ngay(driver, repeat=0):
     el = wait_element_loading(driver, "XPATH", '//android.widget.TextView[@text="Nhận Job ngay "]')
@@ -100,32 +96,51 @@ def completed_job(driver):
     if text == "Thành công":
         el = wait_element_loading(driver, "UIA", 'new UiSelector().text("OK")')
         click_helper(el)
+# Direction is up or down
 
 
 
-# def proccess_flow():
-#     nhan_job_ngay(driver, repeat=0)
-#     do_job(driver)
+def swipe_up(driver, duration, max_swipe):
+    """Swipe up to scroll down (from bottom to top)."""
+    size = driver.get_window_size()
+    start_x = size["width"] / 2
+    start_y = size["height"] * 0.8  # Start at 80% of screen height
+    end_y = size["height"] * 0.2  # End at 20% of screen height
+    driver.swipe(start_x, start_y, start_x, end_y, duration)
+
+def swipe_down(driver, duration, max_swipe):
+    """Swipe down to scroll up (from top to bottom)."""
+    size = driver.get_window_size()
+    start_x = size["width"] / 2
+    start_y = size["height"] * 0.2  # Start at 20% of screen height
+    end_y = size["height"] * 0.8  # End at 80% of screen height
+    driver.swipe(start_x, start_y, start_x, end_y, duration)
+
+def swipe_to_find_element(driver):
+
+
 
 appium_server_url = 'http://localhost:4723'
 
 driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
+print(driver.page_source)
+print(driver.get_window_size())
 
-# Kiem Thuong
-# el = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.TextView[@text="Kiếm Thưởng"]')
-el = wait_element_loading(driver, "XPATH", '//android.widget.TextView[@text="Kiếm Thưởng"]')
-click_helper(el)
+# # Kiem Thuong
+# # el = driver.find_element(by=AppiumBy.XPATH, value='//android.widget.TextView[@text="Kiếm Thưởng"]')
+# # el = wait_element_loading(driver, "XPATH", '//android.widget.TextView[@text="Kiếm Thưởng"]')
+# # click_helper(el)
 
-# Kiem thuong ngay
-# el = driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value='new UiSelector().text("kiếm thưởng ngay ").instance(0)')
-el = wait_element_loading(driver, "UIA", 'new UiSelector().text("kiếm thưởng ngay ").instance(0)')
-click_helper(el)
+# # # Kiem thuong ngay
+# # # el = driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value='new UiSelector().text("kiếm thưởng ngay ").instance(0)')
+# # el = wait_element_loading(driver, "UIA", 'new UiSelector().text("kiếm thưởng ngay ").instance(0)')
+# # click_helper(el)
 
-# Nhan job ngay
-# el = driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value='new UiSelector().text("Nhận Job ngay ")')
-nhan_job_ngay(driver, repeat=0)
-do_job(driver)
-completed_job(driver)
+# # # Nhan job ngay
+# # # el = driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value='new UiSelector().text("Nhận Job ngay ")')
+# # nhan_job_ngay(driver, repeat=0)
+# # do_job(driver)
+# # completed_job(driver)
 
 
 
