@@ -1,0 +1,11 @@
+{
+    "platformName": "Android",
+    "automationName": "uiautomator2",
+    "deviceName": "R5CW823HW4K",
+    "appPackage": "com.golike",
+    "appActivity": "com.golike.MainActivity",
+    "language": "en",
+    "noReset": true,
+    "fullReset": false,
+    "locale": "US"
+}
