@@ -8,6 +8,10 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 class Base:
     def __init__(self):
         self.driver = get_driver()
+        
+    def go_to_app(self, delay=3):
+        self.driver.activate_app("com.golike")
+        time.sleep(2)
 
     def swipe_up(self, max_swipe, duration=1000):
         try:
@@ -36,8 +40,8 @@ class Base:
             return None
 
     def swipe(self, max_swipe = 2):
-        self.swipe_up(max_swipe, duration=100)
-        self.swipe_down(max_swipe, duration=100)
+        self.swipe_up(max_swipe, duration=1000)
+        self.swipe_down(max_swipe, duration=1000)
 
     def is_element_present(self, By, path):
         try:
@@ -51,7 +55,7 @@ class Base:
         except Exception:
             return None
         
-    def advance_is_element_present(self, By, path, retry = 2, delay = 3):
+    def advance_is_element_present(self, By, path, retry = 2, delay = 5):
         result = self.is_element_present(By, path)
 
         if retry == 0:
@@ -63,11 +67,11 @@ class Base:
         
         self.swipe()
 
-        print(f"{retry} Element not found: {path}. Retry in {delay} seconds")
+        print(f" Element not found: {path}.")
         time.sleep(delay)
         return self.advance_is_element_present(By, path, retry - 1)
 
-    def _perform_action_with_retry(self, By, path, action, retry=2, delay = 3):
+    def _perform_action_with_retry(self, By, path, action, retry=2, delay = 5):
         """
         Perform an action (like click or get text) with retry logic.
         :param By: The method to locate the element (e.g., By.XPATH)
@@ -81,6 +85,7 @@ class Base:
             el = self.advance_is_element_present(By, path)
             if el:
                 try:
+                    time.sleep(delay)
                     # Perform the desired action
                     result = action(el)
                     print(f"Successfully performed action on element: {path}")
@@ -89,8 +94,7 @@ class Base:
                     print(f"Error performing action on element: {path}")
                     return False
             else:
-                print(f"Element not found/clickable/textable, attempt {attempt + 1}/{retry}")
-                time.sleep(delay)
+                print(f"Element not found/clickable/textable, attempt {attempt + 1}/{retry}")                
                 attempt += 1
         print(f"Failed to perform action on element: {path} after {retry} attempts")
         return False
