@@ -9,7 +9,7 @@ def get_driver():
         with open("config/config.json", "r") as file:
             capabilities = json.load(file)
 
-        appium_server_url = 'http://localhost:4723/wd/hub'
+        appium_server_url = 'http://localhost:4723'
         driver = webdriver.Remote(appium_server_url, options=UiAutomator2Options().load_capabilities(capabilities))
         
         # Small delay to ensure app launch stability

@@ -1,0 +1,4 @@
+1/ click '//android.widget.TextView[@text="Kiếm Thưởng"]'
+2/ click '//android.widget.TextView[@text="Instagram"]'
+3/ click '//android.widget.TextView[@text="Nhận Job ngay "]'
+4/ get title job, ''//android.view.View[@resource-id="app"]/android.view.View/android.view.View[2]/android.view.View[1]//android.widget.TextView'

@@ -1,3 +1,5 @@
-from helper_function import Driver
+from automation_base.Base import Base
 
-Driver.get_driver()
+
+if __name__ == '__main__':
+    base = Base()
