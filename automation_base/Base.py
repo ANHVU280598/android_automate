@@ -11,7 +11,8 @@ class Base:
         
     def go_to_app(self, delay=3):
         self.driver.activate_app("com.golike")
-        time.sleep(2)
+        time.sleep(delay)
+        return True
 
     def swipe_up(self, max_swipe, duration=1000):
         try:
@@ -37,11 +38,12 @@ class Base:
             return True
         except Exception as e:
             print(f'Error during swipe down')
-            return None
+            return False
 
     def swipe(self, max_swipe = 2):
         self.swipe_up(max_swipe, duration=1000)
         self.swipe_down(max_swipe, duration=1000)
+        return True
 
     def is_element_present(self, By, path):
         try:
@@ -49,26 +51,24 @@ class Base:
                 el = self.driver.find_element(by=AppiumBy.XPATH, value=path)
             elif By == "UIA":
                 el = self.driver.find_element(by=AppiumBy.ANDROID_UIAUTOMATOR, value=path)
-            else:
-                return None
             return el
         except Exception:
-            return None
+            return False
         
-    def advance_is_element_present(self, By, path, retry = 2, delay = 5):
+    def advance_is_element_present(self, By, path, retry = 2, delay = 3):
+        time.sleep(delay)
         result = self.is_element_present(By, path)
 
         if retry == 0:
             print(f'Cannot found element: {path}')
-            return None
+            return False
         
-        if result is not None:
+        if result:
             return result
         
-        self.swipe()
+        self.swipe(max_swipe=1)
 
         print(f" Element not found: {path}.")
-        time.sleep(delay)
         return self.advance_is_element_present(By, path, retry - 1)
 
     def _perform_action_with_retry(self, By, path, action, retry=2, delay = 5):
@@ -81,6 +81,7 @@ class Base:
         :return: The result of the action (True for success, False for failure)
         """
         attempt = 0
+        time.sleep(delay)
         while attempt < retry:
             el = self.advance_is_element_present(By, path)
             if el:
@@ -103,6 +104,5 @@ class Base:
         return self._perform_action_with_retry(By, path, lambda el: el.click())
 
     def get_element_text(self, By, path):
-        text = self._perform_action_with_retry(By, path, lambda el: el.text)
-        print(text)
-        return text
+        return self._perform_action_with_retry(By, path, lambda el: el.text)
+    

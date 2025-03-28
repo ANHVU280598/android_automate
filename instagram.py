@@ -4,6 +4,7 @@ import time
 class Instagram:
     def __init__(self):
         self.base = Base()
+        self.driver = self.base.driver
 
     def by_pass_anouncement(self):
         path = '//android.widget.Button[@text="Đã hiểu"]'
@@ -14,32 +15,42 @@ class Instagram:
         return self.base.click_on_element('XPATH', path)
 
     def click_instagram(self):
-        path = '//android.widget.TextView[@text="Instagram"]'
+        path = '(//android.widget.TextView[@text="kiếm thưởng ngay "])[1]'
         return self.base.click_on_element('XPATH', path)
 
     def click_nhan_job_ngay(self, retry = 3, delay = 3):
+        self.driver.activate_app('com.golike')
         if retry == 0:
             return False
 
-        path = '//android.widget.TextView[@text="Nhận Job ngay "]'
-        self.base.click_on_element('XPATH', path)
+        path = 'new UiSelector().text("Nhận Job ngay ")'
+        self.base.click_on_element('UIA', path)
+        
+        path = '//android.view.View[@resource-id="app"]/android.view.View/android.view.View[2]/android.view.View[1]//android.widget.TextView'
+        job_title = self.base.get_element_text('XPATH', path)
+        if job_title:
+            print("legit")
+            return job_title
 
-        # Check if any ohter anouncement pop up
+        # Check if any other anouncement pop up
         path = '//android.widget.TextView[@resource-id="swal2-content"]'
         if self.base.advance_is_element_present('XPATH', path):
             path = '//android.widget.Button[@text="OK"]'
             self.base.click_on_element('XPATH', path)
-            time.sleep(delay)
             return self.click_nhan_job_ngay(retry - 1)
-        return True
+        
     
     def increase_follwer_job(self):
         path = 'new UiSelector().resourceId("com.instagram.android:id/profile_header_follow_button")'
-        return self.base.click_on_element("UIA", path)
+        if self.base.click_on_element("UIA", path):
+            return True
+        return False
 
     def increase_like_job(self):
         path = 'new UiSelector().resourceId("com.instagram.android:id/row_feed_button_like")'
-        return self.base.click_on_element("UIA", path)
+        if self.base.click_on_element("UIA", path):
+            return True
+        return False
     
     def send_report(self):
         self.base.go_to_app()
@@ -56,11 +67,12 @@ class Instagram:
 
         # Click Ok Btn
         path = '//android.widget.Button[@text="OK"]'
-        return self.base.click_on_element("XPATH", path)
+        self.base.click_on_element("XPATH", path)
+
+        return True
 
     def do_job_title(self):
-        path = '//android.view.View[@resource-id="app"]/android.view.View/android.view.View[2]/android.view.View[1]//android.widget.TextView'
-        job_title = self.base.get_element_text('XPATH', path)
+        job_title = self.click_nhan_job_ngay()
 
         path = '//android.view.View[@content-desc="Instagram"]'
         self.base.click_on_element("XPATH", path)
@@ -68,9 +80,9 @@ class Instagram:
         result = None
         if job_title == "TĂNG LƯỢT THEO DÕI":
             result = self.increase_follwer_job()
-        if job_title == "TĂNG LIKE CHO BÀI VIẾT":
+        elif job_title == "TĂNG LIKE CHO BÀI VIẾT":
             result = self.increase_like_job()
-        if job_title is None:
+        else:
             result = "new case"
             time.sleep(10000)
 
@@ -79,23 +91,29 @@ class Instagram:
         
         return True
 
-    def complete_job(self):
+    def complete_job(self, delay=3):
         self.base.go_to_app()
+        time.sleep(delay)
         path = '//android.widget.Button[@text="Hoàn thành"]'
         self.base.click_on_element('XPATH', path)
         path = '//android.widget.Button[@text="OK"]'
         self.base.click_on_element('XPATH', path)
+        return True
 
 if __name__ == "__main__":
     bot = Instagram()
 
     while True:
-        # bot.click_kiem_thuong()
-        # bot.click_instagram()
-        # bot.click_nhan_job_ngay()
-        # bot.do_job_title()
-        # bot.complete_job()
-        bot.increase_like_job()
+        if bot.click_kiem_thuong() == False:
+            break
+
+        if bot.click_instagram() == False:
+            break
+        if bot.do_job_title() == False:
+            break
+        if bot.complete_job() == False:
+            break
+
 
 
     
