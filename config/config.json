@@ -7,5 +7,6 @@
     "language": "en",
     "noReset": true,
     "fullReset": false,
-    "locale": "US"
+    "locale": "US",
+    "deviceudid": "R5CW823HW4K"
 }

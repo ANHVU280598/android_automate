@@ -7,6 +7,8 @@ class Instagram:
         self.driver = self.base.driver
 
     def by_pass_anouncement(self):
+        self.base.current_package()
+        self.base.terminate_app()
         path = '//android.widget.Button[@text="Đã hiểu"]'
         return self.base.click_on_element('XPATH', path)
     
@@ -15,11 +17,10 @@ class Instagram:
         return self.base.click_on_element('XPATH', path)
 
     def click_instagram(self):
-        path = '(//android.widget.TextView[@text="kiếm thưởng ngay "])[1]'
+        path = '//android.widget.TextView[@text="Instagram"]'
         return self.base.click_on_element('XPATH', path)
 
     def click_nhan_job_ngay(self, retry = 3, delay = 3):
-        self.driver.activate_app('com.golike')
         if retry == 0:
             return False
 
@@ -28,15 +29,25 @@ class Instagram:
         
         path = '//android.view.View[@resource-id="app"]/android.view.View/android.view.View[2]/android.view.View[1]//android.widget.TextView'
         job_title = self.base.get_element_text('XPATH', path)
-        if job_title:
-            print("legit")
+        if job_title == "TĂNG LƯỢT THEO DÕI" or job_title == "TĂNG LIKE CHO BÀI VIẾT":
+            print(job_title)
             return job_title
 
         # Check if any other anouncement pop up
-        path = '//android.widget.TextView[@resource-id="swal2-content"]'
-        if self.base.advance_is_element_present('XPATH', path):
+        path = '//android.widget.TextView[@resource-id="swal2-title"]'
+        anounment_text = bot.base.get_element_text('XPATH', path)
+
+        if anounment_text == 'Thông báo':
+            time.sleep(20)
+            print("TAKE BREAK")
             path = '//android.widget.Button[@text="OK"]'
             self.base.click_on_element('XPATH', path)
+            return self.click_nhan_job_ngay(retry = 3)
+            
+        if anounment_text == 'Thành công':
+            path = '//android.widget.Button[@text="OK"]'
+            self.base.click_on_element('XPATH', path)
+        else:
             return self.click_nhan_job_ngay(retry - 1)
         
     
@@ -51,9 +62,13 @@ class Instagram:
         if self.base.click_on_element("UIA", path):
             return True
         return False
-    
+    def post_comment_job(self):
+        path = '//android.widget.TextView[@text="Click để Copy bình luận"]'
+        self.base.click_on_element("XPATH", path)
+
     def send_report(self):
         self.base.go_to_app()
+        self.base.terminate_app()
         path = '//android.widget.Button[@text="Báo lỗi"]'
         self.base.click_on_element("XPATH", path)
 
@@ -72,27 +87,35 @@ class Instagram:
         return True
 
     def do_job_title(self):
-        job_title = self.click_nhan_job_ngay()
+        path = '//android.view.View[@resource-id="app"]/android.view.View/android.view.View[2]/android.view.View[1]//android.widget.TextView'
+        job_title = self.base.get_element_text('XPATH', path)
+        print(job_title)
+
 
         path = '//android.view.View[@content-desc="Instagram"]'
         self.base.click_on_element("XPATH", path)
+        time.sleep(5)
 
-        result = None
+        result = False
         if job_title == "TĂNG LƯỢT THEO DÕI":
             result = self.increase_follwer_job()
         elif job_title == "TĂNG LIKE CHO BÀI VIẾT":
             result = self.increase_like_job()
+        elif job_title == "TĂNG LƯỢT COMMENT":
+            return
         else:
             result = "new case"
-            time.sleep(10000)
 
         if result == False:
+            print("Result is False")
             return self.send_report()
-        
-        return True
+        else:
+            return self.complete_job()
+
 
     def complete_job(self, delay=3):
         self.base.go_to_app()
+        self.base.terminate_app()
         time.sleep(delay)
         path = '//android.widget.Button[@text="Hoàn thành"]'
         self.base.click_on_element('XPATH', path)
@@ -102,17 +125,44 @@ class Instagram:
 
 if __name__ == "__main__":
     bot = Instagram()
+    bot.base.current_package()
 
-    while True:
-        if bot.click_kiem_thuong() == False:
-            break
 
-        if bot.click_instagram() == False:
-            break
-        if bot.do_job_title() == False:
-            break
-        if bot.complete_job() == False:
-            break
+
+
+    # # bot.by_pass_anouncement()
+    # reset_app = False
+    # while True:
+    #     bot.base.go_to_app()
+
+    #     if reset_app:
+    #         bot.base.terminate_app('com.golike')
+    #         bot.base.quit_driver()
+    #         bot = Instagram()
+    #         time.sleep(5)
+    #         reset_app = False
+
+    #     if not bot.click_kiem_thuong():
+    #         reset_app = True
+    #         continue
+    #     else:
+    #         reset_app = False
+        
+    #     if not bot.click_instagram():
+    #         reset_app = True
+    #         continue
+    #     else:
+    #         reset_app = False
+
+    #     if not bot.click_nhan_job_ngay():
+    #         reset_app = True
+    #         continue
+    #     else:
+    #         reset_app = False
+
+    #     bot.do_job_title()
+
+        # bot.complete_job()
 
 
 
